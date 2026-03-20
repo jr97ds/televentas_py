@@ -17,7 +17,15 @@ class Producto:
 class Catalogo:
     def __init__(self):
         self._productos = []
+    
+    # Cargar productos al catálogo 
+    def agregar_producto(self, producto : Producto) -> None:
+        self._productos.append(producto)
 
+    def mostrar_catalogo(self) -> None:
+        for producto in self._productos:
+            print(f"ID: {producto._id_producto} - {producto._nombre} - ${producto._precio} - Stock: {producto._stock}")
+    
 
 class Suscripcion:
 
@@ -45,7 +53,7 @@ class InventarioExcel(Inventario):
     def __init__(self, ruta_archivo : str):
         self._ruta_archivo = ruta_archivo
 
-    def cargar_inventario_externo(self):
+    def cargar_inventario_externo(self) -> list:
         wb = load_workbook(self._ruta_archivo)
         ws = wb.active
         productos = []
