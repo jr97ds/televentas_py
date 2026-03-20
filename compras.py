@@ -1,4 +1,5 @@
 from personas import Cliente
+from abc import ABC
 
 class OrdenCompra:
 
@@ -30,3 +31,15 @@ class Queja:
         self.cliente = cliente
         self.descripcion = descripcion
         self.estado = "Pendiente"
+
+class MetodoPago(ABC):
+    pass
+    
+class TarjetaCredito(MetodoPago):
+
+    def __init__(self, numero : str, titular : str, 
+                 fecha_expiracion : str, cvv : str):
+        self.numero = numero
+        self.titular = titular
+        self.fecha_expiracion = fecha_expiracion
+        self.cvv = cvv
