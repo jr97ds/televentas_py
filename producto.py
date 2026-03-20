@@ -2,6 +2,7 @@ from personas import Cliente
 from abc import ABC , abstractmethod
 from openpyxl import load_workbook
 
+
 class Producto: 
 
     def __init__(self, id_producto : str, nombre : str, 
@@ -12,6 +13,18 @@ class Producto:
         self._descripcion = descripcion
         self._precio = precio
         self._stock = stock
+
+    @property
+    def id_producto(self):
+        return self._id_producto
+    
+    @property
+    def nombre(self):
+        return self._nombre
+    
+    @property
+    def precio(self):
+        return self._precio
 
 
 class Catalogo:
@@ -57,9 +70,9 @@ class InventarioExcel(Inventario):
         wb = load_workbook(self._ruta_archivo)
         ws = wb.active
         productos = []
-        for row in ws.iter_rows(min_row=2, values_only=True):
+        for row in ws.iter_rows(min_row=2, values_only=True): # type: ignore
             id_producto, nombre, descripcion, precio, stock = row
-            producto = Producto(id_producto, nombre, descripcion, precio, stock)
+            producto = Producto(id_producto, nombre, descripcion, precio, stock) # type: ignore
             productos.append(producto)
             wb.close()
         return productos

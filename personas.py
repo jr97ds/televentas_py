@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 
+
 # Clase abstracta que sirve de base para todas los usuarios involucrados
 class Persona(ABC):
 
@@ -42,6 +43,17 @@ class Cliente(Persona):
     @property
     def nombre_completo(self):
         return f"{self._nombre} {self._apellido}"
+    
+    @property
+    def ordenes_compra(self):
+        return self._ordenes_compra
+    
+    # Metodo para crear orden de compra desde el cliente loggeado
+    def crear_orden_compra(self): # type: ignore
+        from compras import OrdenCompra
+        orden = OrdenCompra(self)
+        self._ordenes_compra.append(orden)
+        return orden
 
 # Clase abstracta para empleados
 class Empleado(Persona, ABC):
