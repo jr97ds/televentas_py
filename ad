@@ -1,0 +1,69 @@
+[1mdiff --git a/compras.py b/compras.py[m
+[1mindex 84417d2..3618b6d 100644[m
+[1m--- a/compras.py[m
+[1m+++ b/compras.py[m
+[36m@@ -1,5 +1,6 @@[m
+ from personas import Cliente[m
+ from abc import ABC[m
+[32m+[m[32mfrom producto import Producto[m
+ [m
+ class OrdenCompra:[m
+ [m
+[36m@@ -7,19 +8,19 @@[m [mclass OrdenCompra:[m
+ [m
+     def __init__(self, cliente : Cliente, metodo_pago : MetodoPago):[m
+         OrdenCompra._contador += 1[m
+[31m-        self.id_orden = f"OC-{OrdenCompra._contador}"[m
+[31m-        self.cliente = cliente[m
+[31m-        self.detalles = [][m
+[31m-        self.total = 0[m
+[31m-        self.estado = "En proceso"[m
+[31m-        self.metodo_pago = metodo_pago[m
+[32m+[m[32m        self._id_orden = f"OC-{OrdenCompra._contador}"[m
+[32m+[m[32m        self._cliente = cliente[m
+[32m+[m[32m        self._detalles = [][m
+[32m+[m[32m        self._total = 0[m
+[32m+[m[32m        self._estado = "En proceso"[m
+[32m+[m[32m        self._metodo_pago = metodo_pago[m
+ [m
+ class DetalleOrden:[m
+ [m
+     def __init__(self, producto : Producto, cantidad : int):[m
+[31m-        self.producto = producto[m
+[31m-        self.cantidad = cantidad[m
+[31m-        self.subtotal = producto.precio * cantidad[m
+[32m+[m[32m        self._producto = producto[m
+[32m+[m[32m        self._cantidad = cantidad[m
+[32m+[m[32m        self._subtotal = producto.precio * cantidad[m
+ [m
+ class Queja:[m
+ [m
+[36m@@ -27,10 +28,10 @@[m [mclass Queja:[m
+ [m
+     def __init__(self, cliente : Cliente, descripcion : str):[m
+         Queja._contador += 1[m
+[31m-        self.id_queja = f"PQR-{Queja._contador}"[m
+[31m-        self.cliente = cliente[m
+[31m-        self.descripcion = descripcion[m
+[31m-        self.estado = "Pendiente"[m
+[32m+[m[32m        self._id_queja = f"PQR-{Queja._contador}"[m
+[32m+[m[32m        self._cliente = cliente[m
+[32m+[m[32m        self._descripcion = descripcion[m
+[32m+[m[32m        self._estado = "Pendiente"[m
+ [m
+ class MetodoPago(ABC):[m
+     pass[m
+[36m@@ -39,7 +40,7 @@[m [mclass TarjetaCredito(MetodoPago):[m
+ [m
+     def __init__(self, numero : str, titular : str, [m
+                  fecha_expiracion : str, cvv : str):[m
+[31m-        self.numero = numero[m
+[31m-        self.titular = titular[m
+[31m-        self.fecha_expiracion = fecha_expiracion[m
+[31m-        self.cvv = cvv[m
+\ No newline at end of file[m
+[32m+[m[32m        self._numero = numero[m
+[32m+[m[32m        self._titular = titular[m
+[32m+[m[32m        self._fecha_expiracion = fecha_expiracion[m
+[32m+[m[32m        self._cvv = cvv[m
+\ No newline at end of file[m
