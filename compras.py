@@ -6,14 +6,14 @@ class OrdenCompra:
 
     _contador = 0
 
-    def __init__(self, cliente : Cliente, metodo_pago : MetodoPago):
+    def __init__(self, cliente : Cliente):
         OrdenCompra._contador += 1
         self._id_orden = f"OC-{OrdenCompra._contador}"
         self._cliente = cliente
         self._detalles = []
         self._total = 0
         self._estado = "En proceso"
-        self._metodo_pago = metodo_pago
+        self._metodo_pago = None
 
 class DetalleOrden:
 
