@@ -110,6 +110,10 @@ while True:
                 print("2. Volver al menú anterior")
                 opcion_orden = input("\n" + "Seleccione una opción: ")
 
+                if opcion_orden == "1":
+                    cliente_actual.crear_orden_compra()
+
+                # Desde catalogo , regresar a menu cliente loggeado
                 if opcion_orden == "2":
                     continue
 
