@@ -27,6 +27,9 @@ class OrdenCompra:
     def total(self):
         return self._total
     
+    @property
+    def id_orden(self):
+        return self._id_orden
 
     # Metodo para agregar productos a la orden de compra
     def agregar_producto(self, producto : Producto, cantidad : int) -> None:
@@ -41,6 +44,12 @@ class OrdenCompra:
                 self._total -= detalle.subtotal
                 self._detalles.remove(detalle)
                 break
+
+    # Metodo para agregar metodo de pago a la orden de compra
+    def agregar_metodo_pago(self, metodo_pago : MetodoPago) -> None:
+        self._metodo_pago = metodo_pago
+        self._estado = "Pagada"
+    
 
 class DetalleOrden:
 

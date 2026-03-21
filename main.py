@@ -1,11 +1,12 @@
-from compras import OrdenCompra
+from compras import OrdenCompra, TarjetaCredito
 from personas import Cliente
 from producto import Producto , InventarioExcel , Catalogo , Suscripcion
 
-jose = Cliente("Jose", "Rojas", "Calle 123", "jose@gmail.com")
+jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
 
-clientes = [jose]
-cliente_actual = None
+clientes = [jose] # Lista para almacenar todos los clientes registrados en el sistema
+ordenes_compra = [] # Lista para almacenar todas las ordenes de compra realizadas
+cliente_actual = None 
 login = False
 
 #Creación de Productos a partir del inventario externo
@@ -152,7 +153,7 @@ while True:
                                     break
 
                                 # Terminar proceso de compra y pasar a pago
-                                if status_orden == "0":
+                                elif status_orden == "0":
                                     orden_compra_actual._estado = "Pendiente Pago" 
                                     print("\n" + "Orden lista para pago, por favor agregue su metodo de pago")
                                     break
@@ -171,7 +172,7 @@ while True:
                                         else :
                                             print("\n" + "Producto no encontrado en su orden, por favor intente de nuevo")
                                             break
-                                    
+                                                  
                     # Desde catalogo , regresar a menu cliente loggeado
                     elif opcion_orden == "2":
                         break
@@ -180,9 +181,35 @@ while True:
                         print("\n" + "Opción inválida, por favor seleccione una opción válida")
                         continue
 
+                    if orden_compra_actual.estado == "Pendiente Pago":
+                        break
+                    
+                    
                                                 
-            # SEGUIR AQUI Procedimiento para agregar metodo de pago a la orden de compra -SEGUIR AQUI
-                print("\n" + "Seleccione su método de pago")
+            # Asignar metodo de pago a la orden de compra y finalizar la orden
+                while orden_compra_actual.estado == "Pendiente Pago":
+
+                    print("\n" + "Eliga su método de pago")
+                    print("1. Tarjeta de crédito")
+                    metodo_pago_seleccionado = input("\n" + "Seleccione una opción: ")
+
+                    if metodo_pago_seleccionado == "1":
+                        numero_tarjeta = input("Ingrese el número de su tarjeta de crédito: ")
+                        fecha_expiracion = input("Ingrese la fecha de expiración de su tarjeta (MM/AA): ")
+                        codigo_seguridad = input("Ingrese el código de seguridad de su tarjeta: ")
+                        
+                        tarjeta= TarjetaCredito(numero_tarjeta, cliente_actual.nombre_completo,  # type: ignore
+                                                fecha_expiracion, codigo_seguridad) # type: ignore
+                        
+                        orden_compra_actual.agregar_metodo_pago(tarjeta)
+                        print("\n" + f"Pago realizado con éxito, su orden {orden_compra_actual.id_orden} ha sido finalizada")
+                        ordenes_compra.append(orden_compra_actual)
+                        
+                        break
+                    else:
+                        print("\n" + "Opción de método de pago no válida, por favor seleccione una opción válida")
+                        
+
 
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":
