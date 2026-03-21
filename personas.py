@@ -71,17 +71,17 @@ class Cliente(Persona):
         else:
             print("\n" + "Órdenes de Compra:")
             for orden in self._ordenes_compra:
-                print(f"ID: {orden.id_orden} - Total: ${orden.total} - Estado: {orden.estado}")
+                print(orden)
 
     def borrar_orden_compra(self, id_orden : str) -> None:
         for orden in self._ordenes_compra:
-            if orden.estado != "Enviado":
                 if orden.id_orden == id_orden:
                     self._ordenes_compra.remove(orden)
                     print(f"\n" + f"Orden {id_orden} eliminada con éxito.")
                     break
         else:
             print(f"\n" + f"No se encontró una orden con ID {id_orden}.")
+        
     
     def activar_suscripcion(self) -> None:
         from producto import Suscripcion
@@ -134,7 +134,36 @@ class AgenteDeposito(Empleado):
                  correo : str, usuario : str, contraseña : str):
         super().__init__(nombre, apellido, correo, usuario, 
                          contraseña)
-        self._cargo = "agente"
+        self._cargo = "Agente"
+
+    @property
+    def nombre_completo(self):
+        return f"{self._nombre} {self._apellido}"
+    
+    @property
+    def usuario(self):
+        return self._usuario
+    
+    @property
+    def cargo(self):
+        return self._cargo
+    
+    @property
+    def contraseña(self): 
+        return self._contraseña
+    
+    def alistar_orden_para_envio(self, orden_compra : OrdenCompra, transportista : EmpresaTransporte) -> None: # type: ignore
+        from logistica import OrdenEnvio
+        
+        if orden_compra._estado == "Pagada":
+            envio = OrdenEnvio(orden_compra) # type: ignore
+            envio.transportista = transportista # type: ignore
+            orden_compra.estado = "Enviada" # type: ignore
+            orden_compra.orden_envio = envio # type: ignore
+
+            print(f"\n" + f"Orden {orden_compra.id_orden} alistada para envío.")
+        else:
+            print(f"\n" + f"Orden {orden_compra.id_orden} no se encuentra en estado pagada.")
 
 class GerenteRP(Empleado):
 
@@ -142,7 +171,7 @@ class GerenteRP(Empleado):
                  correo : str, usuario : str, contraseña : str):
         super().__init__(nombre, apellido, correo, usuario, 
                          contraseña)
-        self._cargo = "gerente"
+        self._cargo = "Gerente"
     
     @property
     def nombre_completo(self):

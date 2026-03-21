@@ -1,6 +1,7 @@
 from compras import OrdenCompra, TarjetaCredito
 from personas import Cliente, GerenteRP , AgenteDeposito
 from producto import Producto , InventarioExcel , Catalogo , Suscripcion
+from logistica import OrdenEnvio , EmpresaTransporte
 
 
 jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
@@ -9,6 +10,10 @@ clientes = [jose] # Lista para almacenar todos los clientes registrados en el si
 gerente = GerenteRP("Luis", "Perez", "gerente@televentas.com", "gerente", "1234")
 agente = AgenteDeposito("Ana", "Gomez", "agente@televentas.com", "agente", "1234")
 empleados = [gerente, agente] # Lista para almacenar todos los empleados registrados en el sistema
+empresa_t1 = EmpresaTransporte("Servientrega")
+empresa_t2 = EmpresaTransporte("Coordinadora")
+empresa_t3 = EmpresaTransporte("DHL")
+transportistas = [empresa_t1, empresa_t2, empresa_t3] # Lista para almacenar todas las empresas de transporte registradas en el sistema
 
 ordenes_compra = [] # Lista para almacenar todas las ordenes de compra realizadas
 quejas = [] # Lista para almacenar todas las quejas registradas en el sistema
@@ -216,6 +221,8 @@ while True:
                         print("\n" + f"Pago realizado con éxito, su orden {orden_compra_actual.id_orden} ha sido finalizada")
                         ordenes_compra.append(orden_compra_actual)
 
+                        orden_compra_actual.actualizar_inventario(inventario) # type: ignore
+
                         break
                     else:
                         opcion_invalida()
@@ -232,10 +239,33 @@ while True:
                         print("\n" + "Presione '1' para eliminar una orden de compra, o '0' para regresar al menú anterior")
                         opcion_eliminar_orden = input("\n" + "Seleccione una opción: ")
                 
+                        # Ruta para eliminar orden de compra
                         if opcion_eliminar_orden == "1":
                             id_orden_a_eliminar = input("\n" + "Ingrese el ID de la orden que desea eliminar: ").upper()
-                            cliente_actual.borrar_orden_compra(id_orden_a_eliminar) # type: ignore
-                            break
+
+                            orden_a_eliminar = None
+                            for orden in cliente_actual.ordenes_compra: # type: ignore
+                                if orden.id_orden == id_orden_a_eliminar:
+                                    orden_a_eliminar = orden
+                                    break
+
+                            if orden_a_eliminar is None:
+                                print("\n" + "No se encontró una orden con ese ID, por favor intente de nuevo")
+                                continue
+
+                            if orden_a_eliminar.estado == "Enviada":
+                                print("\n" + "No se puede eliminar una orden que ya ha sido enviada, por favor intente de nuevo")
+                                continue
+                            else:
+                                orden_a_eliminar.devolver_a_inventario(inventario) # type: ignore
+                                cliente_actual.borrar_orden_compra(id_orden_a_eliminar) # type: ignore
+
+                                if orden_a_eliminar in ordenes_compra:
+                                    ordenes_compra.remove(orden_a_eliminar)
+
+                                print("\n" + f"Orden {id_orden_a_eliminar} cancelada y productos devueltos al inventario")
+                            
+
                         elif opcion_eliminar_orden == "0":
                             break
                         else:
@@ -365,33 +395,107 @@ while True:
         # Login Empleado Registrado
         while not login: 
                     usuario= input("Ingrese su  usuario:")
+                    contraseña = input("Ingrese su contraseña: ")
                     encontrado = False
                     for e in empleados:
-                        if e.usuario == usuario:
+                        if e.usuario == usuario and e._contraseña == contraseña:
                             empleado_actual = e
                             login = True
                             encontrado = True
                             break
                     if not encontrado:
-                            print("\n" + "Usuario no encontrado, por favor intente de nuevo")
+                            print("\n" + "Credenciales no encontradas, por favor intente de nuevo")
 
         # Ruta para gerente 
-        if empleado_actual.cargo == "gerente":
-            print("\n" + f"Bienvenido, {empleado_actual.nombre_completo}!") # type: ignore
-            print("\n" + "Estas son las quejas registradas en el sistema:")
-            if quejas:
-                empleado_actual.mostrar_quejas(quejas) # type: ignore
-            else:
-                print("\n" + "No hay quejas registradas en el sistema")
+        if empleado_actual.cargo == "Gerente": # type: ignore
+            while login:
+                print("\n" + f"Bienvenido, {empleado_actual.cargo}  {empleado_actual.nombre_completo}!") # type: ignore
+                print("\n" + "Estas son las quejas registradas en el sistema:")
+                if quejas:
+                    empleado_actual.mostrar_quejas(quejas) # type: ignore
+                else:
+                    print("\n" + "No hay quejas registradas en el sistema")
 
+                print("\n" + "Presione '0' para cerrar sesión")
+                opcion_cerrar_sesion = input("\n" + "Seleccione una opción: ")
+                
+                if opcion_cerrar_sesion == "0":
+                            print("\n" + "Sesion cerrada")
+                            login = False
+                            empleado_actual = None
+                else:
+                            opcion_invalida()
+                            continue
+                
         # Ruta para agente de deposito
-        elif empleado_actual.cargo == "agente":
-            print("\n" + f"Bienvenido, {empleado_actual.nombre_completo}!") # type: ignore
-            
+        elif empleado_actual.cargo == "Agente": # type: ignore
+            print("\n" + f"Bienvenido {empleado_actual.cargo} {empleado_actual.nombre_completo}!") # type: ignore
+        
+            while login:
+                # Menu Agente de Deposito
+                    print("\n" + "----- MENU AGENTE -----")
+                    print("Seleccione una de las siguientes opciones")   
+                    print("1. Ver órdenes de compra")
+                    print("2. Alistar pedidos para envío")
+                    print("0. Cerrar sesión")
+
+                    opcion_agente = input("\n" + "¿Que desea hacer?: ")
+
+                    # Ver ordenes de compra
+                    if opcion_agente == "1":
+                        if ordenes_compra:
+                            for orden in ordenes_compra:
+                                print(orden)
+                        else:
+                            print("\n" + "No hay órdenes de compra registradas en el sistema")
+                
+                    # Alistar pedidos para envío
+                    elif opcion_agente == "2":
+
+                        while True:
+                            id_orden_a_alistar = input("\n" + "Ingrese el ID de la orden que desea alistar para envío o presione '0' para regresar al menú anterior: ").upper()
+
+                            if id_orden_a_alistar == "0":
+                                break
+                            
+                            orden_a_alistar = None
+                            for orden in ordenes_compra:
+                                if orden.id_orden == id_orden_a_alistar:
+                                    orden_a_alistar = orden
+                                    break
+                            
+                            if orden_a_alistar is None:
+                                print("\n" + "No se encontró una orden con ese ID, por favor intente de nuevo")
+                                continue
+
+                            print("\n" + "Seleccione la empresa de transporte para el envío:")
+                            for idx, transportista in enumerate(transportistas):
+                                print(f"{idx + 1}. {transportista.nombre}")
+                            
+                            opcion_transportista = input("\n" + "Seleccione una opción: ")
+
+                            transportista_seleccionado = transportistas[int(opcion_transportista) - 1]
+                            
+                            if opcion_transportista not in [str(i) for i in range(1, len(transportistas) + 1)]:
+                                opcion_invalida()
+                                continue
+
+                            empleado_actual.alistar_orden_para_envio(orden_a_alistar, transportista_seleccionado) # type: ignore
+                        
+
+                    elif opcion_agente == "0":
+                        print("\n" + "Sesion cerrada")
+                        login = False
+                        empleado_actual = None
+                    
+                    else:
+                        opcion_invalida()
+                        continue
 
 
     else:
-        print("\n" + "Opción Invalida, por favor seleccione una opción válida")
+        opcion_invalida()
+        
 
 
 

@@ -1,6 +1,7 @@
+
 from personas import Cliente
 from abc import ABC
-from producto import Producto
+from producto import Inventario, Producto
 
 class OrdenCompra:
 
@@ -14,6 +15,7 @@ class OrdenCompra:
         self._total = 0
         self._estado = "Abierta"
         self._metodo_pago = None
+        self._orden_envio = None
 
     @property
     def estado(self):
@@ -30,12 +32,33 @@ class OrdenCompra:
     @property
     def id_orden(self):
         return self._id_orden
+    
+    @property
+    def cliente(self):
+        return self._cliente
+    
+    @property
+    def orden_envio(self):
+        return self._orden_envio
+    
+    @orden_envio.setter
+    def orden_envio(self, orden_envio): 
+        self._orden_envio = orden_envio
+    
+    @estado.setter
+    def estado(self, nuevo_estado : str):
+        self._estado = nuevo_estado
 
     # Metodo para agregar productos a la orden de compra
     def agregar_producto(self, producto : Producto, cantidad : int) -> None:
-        detalle = DetalleOrden(producto, cantidad)
-        self._detalles.append(detalle)
-        self._total += detalle.subtotal
+        if cantidad > producto._stock:
+            print(f"\n" + f"No hay suficiente stock para el producto {producto.nombre}. Stock disponible: {producto._stock}")
+            return False # type: ignore
+        else:
+            detalle = DetalleOrden(producto, cantidad)
+            self._detalles.append(detalle)
+            self._total += detalle.subtotal
+            return True # type: ignore
 
     # Metodo para eliminar productos de la orden de compra 
     def eliminar_producto(self, id_producto : str) -> None:
@@ -50,6 +73,18 @@ class OrdenCompra:
         self._metodo_pago = metodo_pago
         self._estado = "Pagada"
     
+    def actualizar_inventario(self,inventario : Inventario) -> None:
+        for detalle in self._detalles:
+            nuevo_stock = detalle._producto.stock - detalle._cantidad
+            inventario.modificar_inventario_externo(detalle._producto, nuevo_stock) # type: ignore
+    
+    def devolver_a_inventario(self, inventario : Inventario) -> None:
+        for detalle in self._detalles:
+            nuevo_stock = detalle._producto.stock + detalle._cantidad
+            inventario.modificar_inventario_externo(detalle._producto, nuevo_stock) # type: ignore
+
+    def __str__(self) -> str:
+        return f"ID: {self._id_orden} - Cliente: {self._cliente.nombre_completo} - Total: ${self._total} - Estado: {self._estado} - Transportista: {self._orden_envio.transportista.nombre if self._orden_envio else 'No asignado'}"
 
 class DetalleOrden:
 

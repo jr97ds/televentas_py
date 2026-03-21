@@ -25,6 +25,10 @@ class Producto:
     @property
     def precio(self):
         return self._precio
+    
+    @property
+    def stock(self):
+        return self._stock
 
 
 class Catalogo:
@@ -79,3 +83,13 @@ class InventarioExcel(Inventario):
             productos.append(producto)
             wb.close()
         return productos
+    
+    def modificar_inventario_externo(self, producto : Producto, cantidad : int) -> None:
+        wb = load_workbook(self._ruta_archivo)
+        ws = wb.active
+        for row in ws.iter_rows(min_row=2): # type: ignore
+            if row[0].value == producto.id_producto:
+                row[4].value = cantidad # type: ignore
+                break
+        wb.save(self._ruta_archivo)
+        wb.close()
