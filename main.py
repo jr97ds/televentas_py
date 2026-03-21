@@ -215,6 +215,21 @@ while True:
             elif opcion_cliente_loggeado == "2":
                 cliente_actual.mostrar_ordenes_compra()  # type: ignore
                 
+                if cliente_actual.ordenes_compra: # type: ignore
+
+                    while True:
+                        print("\n" + "Presione '1' para eliminar una orden de compra, o '0' para regresar al menú anterior")
+                        opcion_eliminar_orden = input("\n" + "Seleccione una opción: ")
+                
+                        if opcion_eliminar_orden == "1":
+                            id_orden_a_eliminar = input("\n" + "Ingrese el ID de la orden que desea eliminar: ").upper()
+                            cliente_actual.borrar_orden_compra(id_orden_a_eliminar) # type: ignore
+                            break
+                        else:
+                            break
+                else:
+                    continue
+
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":
                 print("\n" + "Cerrando sesión...")

@@ -47,6 +47,7 @@ class Cliente(Persona):
     @property
     def ordenes_compra(self):
         return self._ordenes_compra
+        
     
     # Metodo para crear orden de compra desde el cliente loggeado
     def crear_orden_compra(self) -> OrdenCompra: # type: ignore
@@ -62,6 +63,16 @@ class Cliente(Persona):
             print("\n" + "Órdenes de Compra:")
             for orden in self._ordenes_compra:
                 print(f"ID: {orden.id_orden} - Total: ${orden.total} - Estado: {orden.estado}")
+
+    def borrar_orden_compra(self, id_orden : str) -> None:
+        for orden in self._ordenes_compra:
+            if orden.estado != "Enviado":
+                if orden.id_orden == id_orden:
+                    self._ordenes_compra.remove(orden)
+                    print(f"\n" + f"Orden {id_orden} eliminada con éxito.")
+                    break
+        else:
+            print(f"\n" + f"No se encontró una orden con ID {id_orden}.")
 
 
 # Clase abstracta para empleados
