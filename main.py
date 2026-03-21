@@ -1,10 +1,13 @@
 from compras import OrdenCompra, TarjetaCredito
-from personas import Cliente
+from personas import Cliente, GerenteRP , AgenteDeposito
 from producto import Producto , InventarioExcel , Catalogo , Suscripcion
 
-jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
 
+jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
 clientes = [jose] # Lista para almacenar todos los clientes registrados en el sistema
+gerente = GerenteRP("Luis", "Perez", "gerente@televentas.com", "gerente", "1234")
+agente = AgenteDeposito("Ana", "Gomez", "agente@televentas.com", "agente", "1234")
+empleados = [gerente, agente] # Lista para almacenar todos los empleados registrados en el sistema
 ordenes_compra = [] # Lista para almacenar todas las ordenes de compra realizadas
 cliente_actual = None 
 login = False
@@ -339,9 +342,6 @@ while True:
                             opcion_invalida()
                             continue
                     
-
-
-
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":
                 print("\n" + "Cerrando sesión...")
@@ -352,20 +352,26 @@ while True:
 
         
 
-
-
-
-
-
-
-
-
-
-
     # Portal Empleados 
     elif opcion_portal == "2":
         print("\n" + "Bienvenido al Portal de Empleados")
-        # lógica de crear orden
+        print("\n" + "Por favor inicie sesión para continuar")
+        
+        # Login Empleado Registrado
+        while not login: 
+                    usuario= input("Ingrese su correo usuario:")
+                    encontrado = False
+                    for e in empleados:
+                        if e.usuario == usuario:
+                            empleado_actual = e
+                            login = True
+                            encontrado = True
+                            break
+                    if not encontrado:
+                            print("\n" + "Correo no encontrado, por favor intente de nuevo")
+        
+
+
     else:
         print("\n" + "Opción Invalida, por favor seleccione una opción válida")
 
