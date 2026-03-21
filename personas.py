@@ -139,3 +139,11 @@ class GerenteRP(Empleado):
                  correo : str, usuario : str, contraseña : str):
         super().__init__(nombre, apellido, correo, usuario, 
                          contraseña)
+                
+    @property
+    def nombre_completo(self):
+        return f"{self._nombre} {self._apellido}"
+    
+    @property
+    def usuario(self):
+        return self._usuario
