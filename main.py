@@ -94,7 +94,8 @@ while True:
 
         #menu para cliente loggeado
         while login:    
-            print("\n" + "Seleccione una de las siguientes opciones")   
+            print("\n" + "----- MENU CLIENTE -----") 
+            print("Seleccione una de las siguientes opciones")   
             print("1. Ver catálogo de productos")
             print("2. Ver mis órdenes de compra")
             print("3. Ver mis quejas")
@@ -106,7 +107,7 @@ while True:
 
             # Mostrar Catalogo de Productos
             if opcion_cliente_loggeado == "1":
-                print("\n" + "Catálogo de Productos:")
+                print("\n" + "----- CATALOGO -----")
                 catalogo.mostrar_catalogo()
 
                 while True:
@@ -204,18 +205,21 @@ while True:
                         orden_compra_actual.agregar_metodo_pago(tarjeta)
                         print("\n" + f"Pago realizado con éxito, su orden {orden_compra_actual.id_orden} ha sido finalizada")
                         ordenes_compra.append(orden_compra_actual)
-                        
+
                         break
                     else:
                         print("\n" + "Opción de método de pago no válida, por favor seleccione una opción válida")
                         
 
-
+            # Ver ordenes de compra del cliente loggeado
+            elif opcion_cliente_loggeado == "2":
+                cliente_actual.mostrar_ordenes_compra()  # type: ignore
+                
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":
-                    print("\n" + "Cerrando sesión...")
-                    login = False
-                    cliente_actual = None
+                print("\n" + "Cerrando sesión...")
+                login = False
+                cliente_actual = None
                 
             
 

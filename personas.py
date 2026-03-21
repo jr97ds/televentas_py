@@ -49,11 +49,20 @@ class Cliente(Persona):
         return self._ordenes_compra
     
     # Metodo para crear orden de compra desde el cliente loggeado
-    def crear_orden_compra(self): # type: ignore
+    def crear_orden_compra(self) -> OrdenCompra: # type: ignore
         from compras import OrdenCompra
         orden = OrdenCompra(self)
         self._ordenes_compra.append(orden)
         return orden
+    
+    def mostrar_ordenes_compra(self) -> None:
+        if not self._ordenes_compra:
+            print("\n" + "No tiene órdenes de compra registradas.")
+        else:
+            print("\n" + "Órdenes de Compra:")
+            for orden in self._ordenes_compra:
+                print(f"ID: {orden.id_orden} - Total: ${orden.total} - Estado: {orden.estado}")
+
 
 # Clase abstracta para empleados
 class Empleado(Persona, ABC):
