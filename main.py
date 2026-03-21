@@ -42,6 +42,9 @@ def mostrar_orden_actual(orden_compra_actual : OrdenCompra):
     for item in orden_compra_actual.detalles: 
         print(item)
 
+def opcion_invalida():
+    print("\n" + "Opción inválida, por favor seleccione una opción válida")
+
 # --------------------Inicialización del programa-------------------- #
 
 catalogo = inicializar_catalogo(inventario)
@@ -179,7 +182,7 @@ while True:
                         break
 
                     else:
-                        print("\n" + "Opción inválida, por favor seleccione una opción válida")
+                        opcion_invalida()
                         continue
 
                     if orden_compra_actual.estado == "Pendiente Pago":
@@ -208,7 +211,8 @@ while True:
 
                         break
                     else:
-                        print("\n" + "Opción de método de pago no válida, por favor seleccione una opción válida")
+                        opcion_invalida()
+                        continue
                         
 
             # Ver ordenes de compra del cliente loggeado
@@ -225,10 +229,69 @@ while True:
                             id_orden_a_eliminar = input("\n" + "Ingrese el ID de la orden que desea eliminar: ").upper()
                             cliente_actual.borrar_orden_compra(id_orden_a_eliminar) # type: ignore
                             break
-                        else:
+                        elif opcion_eliminar_orden == "0":
                             break
+                        else:
+                            opcion_invalida()
+                            continue
                 else:
                     continue
+
+            #Administrar suscripcion a catalogo
+            elif opcion_cliente_loggeado == "4":
+                #Ruta si no tiene suscripcion activa
+                if cliente_actual.suscripcion is None: # type: ignore
+                    while True:
+                        print("\n" + "No tienes una suscripción activa, Presiona '1' para recibir el catalogo mensualmente y '0' para regresar al menú anterior")
+                        opcion_suscripcion = input("\n" + "Seleccione una opción: ")
+
+                        if opcion_suscripcion == "1":
+                            cliente_actual.activar_suscripcion() # type: ignore
+                            break
+                        
+                        elif opcion_suscripcion == "0":
+                            break
+
+                        else:
+                            opcion_invalida()
+                            continue
+                
+                # Ruta si tiene suscripcion activa 
+                elif cliente_actual.suscripcion.status == "Activa": # type: ignore
+                    while True:
+                        print("\n" + "Ya tienes una suscripción activa, si deseas cancelar tu suscripcion presiona '1', para regresar al menú anterior presiona '0'")
+                        opcion_suscripcion_activa = input("\n" + "Seleccione una opción: ")
+                        # Cancelacion Suscripcion
+                        if opcion_suscripcion_activa == "1":
+                            cliente_actual.cancelar_suscripcion() # type: ignore
+                            break
+                        # Regresar menu anterior
+                        elif opcion_suscripcion_activa == "0":
+                            break
+
+                        else:
+                            opcion_invalida()
+                            continue
+                
+                # Ruta si tiene suscripcion cancelada
+                elif cliente_actual.suscripcion.status == "Cancelada": #type: ignore
+                    while True:
+                        print("\n" + "Tu suscripción está cancelada, si deseas reactivar tu suscripcion presiona '1', para regresar al menú anterior presiona '0'")
+                        opcion_suscripcion_cancelada = input("\n" + "Seleccione una opción: ")
+                        # Reactivar Suscripcion
+                        if opcion_suscripcion_cancelada == "1":
+                            cliente_actual.activar_suscripcion() # type: ignore
+                            break
+                        # Regresar menu anterior
+                        elif opcion_suscripcion_cancelada == "0":
+                            break
+
+                        else:
+                            opcion_invalida()
+                            continue
+                    
+
+
 
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":

@@ -42,9 +42,12 @@ class Catalogo:
 
 class Suscripcion:
 
-    def __init__(self, cliente : Cliente):
-        self._cliente = cliente
+    def __init__(self):
         self._status = "Activa"
+
+    @property
+    def status(self):
+        return self._status
 
 
 # Clase abstracta para inventarios - depende del sistema de inventario externo

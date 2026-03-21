@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 
 
+
+
 # Clase abstracta que sirve de base para todas los usuarios involucrados
 class Persona(ABC):
 
@@ -47,6 +49,10 @@ class Cliente(Persona):
     @property
     def ordenes_compra(self):
         return self._ordenes_compra
+    
+    @property
+    def suscripcion(self):
+        return self._suscripcion
         
     
     # Metodo para crear orden de compra desde el cliente loggeado
@@ -73,6 +79,26 @@ class Cliente(Persona):
                     break
         else:
             print(f"\n" + f"No se encontró una orden con ID {id_orden}.")
+    
+    def activar_suscripcion(self) -> None:
+        from producto import Suscripcion
+        if self._suscripcion is None:
+            self._suscripcion = Suscripcion()
+            print("\n" + "Suscripción activada con éxito.")
+        elif self._suscripcion.status == "Cancelada":
+            self._suscripcion._status = "Activa"
+            print("\n" + "Suscripción reactivada con éxito.")
+        else:
+            print("\n" + "Ya tiene una suscripción activa.")
+        
+    
+    def cancelar_suscripcion(self) -> None:
+        if self._suscripcion is not None:
+            self._suscripcion._status = "Cancelada"
+            print("\n" + "Suscripción cancelada con éxito.")
+        else:
+            print("\n" + "No tiene una suscripción activa para cancelar.")
+
 
 
 # Clase abstracta para empleados
