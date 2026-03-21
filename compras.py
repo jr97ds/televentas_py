@@ -72,12 +72,16 @@ class Queja:
 
     _contador = 0
 
-    def __init__(self, cliente : Cliente, descripcion : str):
+    def __init__(self, cliente : Cliente, descripcion : str, id_orden : str = None): # type: ignore
         Queja._contador += 1
         self._id_queja = f"PQR-{Queja._contador}"
+        self._id_orden = id_orden
         self._cliente = cliente
         self._descripcion = descripcion
         self._estado = "Pendiente"
+    
+    def __str__(self) -> str:
+        return f"ID: {self._id_queja} -id_orden: {self._id_orden} - Cliente: {self._cliente.nombre_completo} -Descripción: {self._descripcion} - Estado: {self._estado}"
 
 class MetodoPago(ABC):
     pass

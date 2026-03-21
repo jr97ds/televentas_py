@@ -53,7 +53,10 @@ class Cliente(Persona):
     @property
     def suscripcion(self):
         return self._suscripcion
-        
+    
+    @property
+    def quejas(self):
+        return self._quejas
     
     # Metodo para crear orden de compra desde el cliente loggeado
     def crear_orden_compra(self) -> OrdenCompra: # type: ignore
@@ -99,6 +102,19 @@ class Cliente(Persona):
         else:
             print("\n" + "No tiene una suscripción activa para cancelar.")
 
+    def mostrar_quejas(self) -> None:
+        if not self._quejas:
+            print("\n" + "No tiene quejas registradas.")
+        else:
+            print("\n" + "Quejas Registradas:")
+            for queja in self._quejas:
+                print(f"- {queja}")
+
+    def crear_queja(self, descripcion : str, id_orden : str = None) -> None: # type: ignore
+        from compras import Queja
+        queja = Queja(self, descripcion, id_orden=id_orden) # type: ignore
+        self._quejas.append(queja)
+        print("\n" + "Queja registrada con éxito.")
 
 
 # Clase abstracta para empleados

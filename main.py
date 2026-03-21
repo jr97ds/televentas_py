@@ -22,14 +22,14 @@ def inicializar_catalogo(inventario : InventarioExcel) -> Catalogo:
 
 
 # menu para seleccionar portal de clientes o empleados
-def menu_usuario():
+def menu_usuario() -> None:
     print("\n" + "----- TeleVentas -----")
     print("1. Portal Clientes")
     print("2. Portal Empleados")
 
 
 # Funcion para crear nuevos clientes y añadirlos a la lista de clientes registrados
-def crear_cliente():
+def crear_cliente() -> Cliente:
     nombre = input("Ingrese su nombre: ")
     apellido = input("Ingrese su apellido: ")
     direccion = input("Ingrese su dirección: ")
@@ -37,12 +37,12 @@ def crear_cliente():
     print("\n" + f"{nombre} , has sido registrado exitosamente")
     return Cliente(nombre, apellido, direccion, correo)
 
-def mostrar_orden_actual(orden_compra_actual : OrdenCompra):
+def mostrar_orden_actual(orden_compra_actual : OrdenCompra) -> None:
     print("\n" + "Orden Actual:")
     for item in orden_compra_actual.detalles: 
         print(item)
 
-def opcion_invalida():
+def opcion_invalida() -> None:
     print("\n" + "Opción inválida, por favor seleccione una opción válida")
 
 # --------------------Inicialización del programa-------------------- #
@@ -236,6 +236,55 @@ while True:
                             continue
                 else:
                     continue
+
+            # Administrar quejas del cliente 
+            elif opcion_cliente_loggeado == "3":
+                # Si no tiene quejas registradas
+                if not cliente_actual.quejas: # type: ignore
+                    print("\n" + "No tiene quejas registradas")
+                # Si tiene quejas registradas
+                else:
+                    cliente_actual.mostrar_quejas() # type: ignore
+
+                while True:
+                    print("\n" + "Presione '1' para registrar una nueva queja, o '0' para regresar al menú anterior")
+                    opcion_queja = input("\n" + "Seleccione una opción: ")
+                        
+                    # Ruta para registrar nueva queja
+                    if opcion_queja == "1":
+                        while True:
+                            descripcion_queja = input("\n" + "Ingrese la descripción de su queja: ")
+                            if descripcion_queja.strip():
+                                break
+                            print("\n" + "La descripción de la queja no puede estar vacía")
+                        while True:
+                            id_orden_queja = input("Ingrese el ID de la orden relacionada con su queja (opcional): ").upper()
+
+                            #Si no ingresa ID , se asigna un none para que se registre sin orden
+                            if id_orden_queja == "":
+                                id_orden_queja = None
+
+                            #busqueda de queja para ver si coincide con existente
+                            orden_encontrada = False
+                            if id_orden_queja is not None:
+                                for orden in cliente_actual.ordenes_compra: # type: ignore
+                                    if orden.id_orden == id_orden_queja:
+                                        orden_encontrada = True
+                                        break
+                                if not orden_encontrada:
+                                    print("\n" + "No se encontró una orden con ese ID, intente de nuevo o presione Enter para registrar la queja sin un ID de orden asociado")
+                                    id_orden_queja = None
+                                    continue
+                             #Registro de queja
+                            cliente_actual.crear_queja(descripcion_queja, id_orden=id_orden_queja) # type: ignore
+                            break
+
+                    # Ruta para regresar al menu anterior
+                    elif opcion_queja == "0":
+                        break
+                    else:
+                        opcion_invalida()
+                        continue
 
             #Administrar suscripcion a catalogo
             elif opcion_cliente_loggeado == "4":
