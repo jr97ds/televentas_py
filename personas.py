@@ -110,11 +110,12 @@ class Cliente(Persona):
             for queja in self._quejas:
                 print(f"- {queja}")
 
-    def crear_queja(self, descripcion : str, id_orden : str = None) -> None: # type: ignore
+    def crear_queja(self, descripcion : str, id_orden : str = None) -> Queja: # type: ignore
         from compras import Queja
         queja = Queja(self, descripcion, id_orden=id_orden) # type: ignore
         self._quejas.append(queja)
         print("\n" + "Queja registrada con éxito.")
+        return queja # type: ignore
 
 
 # Clase abstracta para empleados
@@ -125,6 +126,7 @@ class Empleado(Persona, ABC):
         super().__init__(nombre, apellido, correo)
         self._usuario = usuario
         self._contraseña = contraseña
+        self._cargo = None
 
 class AgenteDeposito(Empleado):
 
@@ -132,14 +134,16 @@ class AgenteDeposito(Empleado):
                  correo : str, usuario : str, contraseña : str):
         super().__init__(nombre, apellido, correo, usuario, 
                          contraseña)
-        
+        self._cargo = "agente"
+
 class GerenteRP(Empleado):
 
     def __init__(self, nombre : str, apellido : str, 
                  correo : str, usuario : str, contraseña : str):
         super().__init__(nombre, apellido, correo, usuario, 
                          contraseña)
-                
+        self._cargo = "gerente"
+    
     @property
     def nombre_completo(self):
         return f"{self._nombre} {self._apellido}"
@@ -147,3 +151,16 @@ class GerenteRP(Empleado):
     @property
     def usuario(self):
         return self._usuario
+    
+    @property
+    def cargo(self):
+        return self._cargo
+    
+    # Metodo para mostrar quejas registradas en el sistema
+    def mostrar_quejas(self, quejas : list) -> None:
+        if not quejas:
+            print("\n" + "No hay quejas registradas en el sistema.")
+        else:
+            print("\n" + "Quejas Registradas:")
+            for queja in quejas:
+                print(f"- {queja}")

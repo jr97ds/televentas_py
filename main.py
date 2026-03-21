@@ -5,10 +5,14 @@ from producto import Producto , InventarioExcel , Catalogo , Suscripcion
 
 jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
 clientes = [jose] # Lista para almacenar todos los clientes registrados en el sistema
+
 gerente = GerenteRP("Luis", "Perez", "gerente@televentas.com", "gerente", "1234")
 agente = AgenteDeposito("Ana", "Gomez", "agente@televentas.com", "agente", "1234")
 empleados = [gerente, agente] # Lista para almacenar todos los empleados registrados en el sistema
+
 ordenes_compra = [] # Lista para almacenar todas las ordenes de compra realizadas
+quejas = [] # Lista para almacenar todas las quejas registradas en el sistema
+
 cliente_actual = None 
 login = False
 
@@ -278,8 +282,9 @@ while True:
                                     print("\n" + "No se encontró una orden con ese ID, intente de nuevo o presione Enter para registrar la queja sin un ID de orden asociado")
                                     id_orden_queja = None
                                     continue
-                             #Registro de queja
-                            cliente_actual.crear_queja(descripcion_queja, id_orden=id_orden_queja) # type: ignore
+                            #Registro de queja
+                            ultimaqueja = cliente_actual.crear_queja(descripcion_queja, id_orden=id_orden_queja) # type: ignore
+                            quejas.append(ultimaqueja) # type: ignore
                             break
 
                     # Ruta para regresar al menu anterior
@@ -359,7 +364,7 @@ while True:
         
         # Login Empleado Registrado
         while not login: 
-                    usuario= input("Ingrese su correo usuario:")
+                    usuario= input("Ingrese su  usuario:")
                     encontrado = False
                     for e in empleados:
                         if e.usuario == usuario:
@@ -368,8 +373,21 @@ while True:
                             encontrado = True
                             break
                     if not encontrado:
-                            print("\n" + "Correo no encontrado, por favor intente de nuevo")
-        
+                            print("\n" + "Usuario no encontrado, por favor intente de nuevo")
+
+        # Ruta para gerente 
+        if empleado_actual.cargo == "gerente":
+            print("\n" + f"Bienvenido, {empleado_actual.nombre_completo}!") # type: ignore
+            print("\n" + "Estas son las quejas registradas en el sistema:")
+            if quejas:
+                empleado_actual.mostrar_quejas(quejas) # type: ignore
+            else:
+                print("\n" + "No hay quejas registradas en el sistema")
+
+        # Ruta para agente de deposito
+        elif empleado_actual.cargo == "agente":
+            print("\n" + f"Bienvenido, {empleado_actual.nombre_completo}!") # type: ignore
+            
 
 
     else:
