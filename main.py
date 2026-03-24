@@ -5,9 +5,8 @@ from logistica import EmpresaTransporte
 
 
 # ----- CARGA DE DATOS PARA PRUEBAS ----- #
-jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
+jose = Cliente("Jose", "Rojas", "jose@gmail.com")
 clientes = [jose] # Lista para almacenar todos los clientes registrados
-
 gerente = GerenteRP("Luis", "Perez", 
                     "gerente@televentas.com", "gerente", "1234")
 agente = AgenteDeposito("Ana", "Gomez", "agente@televentas.com",
@@ -47,10 +46,9 @@ def menu_usuario() -> None:
 def crear_cliente() -> Cliente:
     nombre = input("Ingrese su nombre: ")
     apellido = input("Ingrese su apellido: ")
-    direccion = input("Ingrese su dirección: ")
     correo = input("Ingrese su correo electrónico: ")
     print("\n" + f"{nombre} , has sido registrado exitosamente")
-    return Cliente(nombre, apellido, direccion, correo)
+    return Cliente(nombre, apellido, correo)
 
 # Funcion para mostrar la orden de compra actual del cliente loggeado
 def mostrar_orden_actual(orden_compra_actual : OrdenCompra) -> None:
@@ -70,7 +68,13 @@ def proceso_orden(orden_compra_actual : OrdenCompra,
             print("\n" + f"Producto  eliminado de su orden")
             mostrar_orden_actual(orden_compra_actual)
             break
+        else:
+            print("\n" + "Producto no encontrado "
+                f"en su orden, por favor intente "
+                f"de nuevo")
+            break
 
+# Funcion para mostrar el menu del cliente loggeado y gestionar sus opciones
 def menu_cliente_loggeado(cliente_actual : Cliente,
                           catalogo : Catalogo,
                           inventario : InventarioExcel,
@@ -164,11 +168,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                                 proceso_orden(orden_compra_actual, 
                                               id_producto_a_eliminar)
                             
-                            else:
-                                print("\n" + "Producto no encontrado "
-                                    f"en su orden, por favor intente "
-                                    f"de nuevo")
-                                break
+                            
                                                 
                 # Desde catalogo , regresar a menu cliente loggeado
                 elif opcion_orden == "2":
@@ -199,8 +199,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                         "Ingrese el código de seguridad de su tarjeta: "
                         )
                     
-                    tarjeta= TarjetaCredito(numero_tarjeta, 
-                                            cliente_actual.nombre_completo,  
+                    tarjeta= TarjetaCredito(numero_tarjeta,  
                                             fecha_expiracion, codigo_seguridad) 
                     
                     orden_compra_actual.agregar_metodo_pago(tarjeta)
@@ -596,7 +595,6 @@ while True:
             login = False
             empleado_actual = None
             
-
     else:
         opcion_invalida()
         

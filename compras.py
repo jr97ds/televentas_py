@@ -1,4 +1,7 @@
-from personas import Cliente
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from personas import Cliente
 from abc import ABC
 from producto import Inventario, Producto
 
