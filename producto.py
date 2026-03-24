@@ -1,4 +1,3 @@
-from personas import Cliente
 from abc import ABC , abstractmethod
 from openpyxl import load_workbook
 
@@ -44,11 +43,16 @@ class Catalogo:
         self._productos.append(producto)
 
     def mostrar_catalogo(self) -> None:
-        for producto in self._productos:
-            print(f"ID: {producto._id_producto} - "
-                  f"{producto._nombre} - ${producto._precio} - "
+        for producto in self.productos:
+            print(f"ID: {producto.id_producto} - "
+                  f"{producto.nombre} - ${producto.precio} - "
                   f"Stock: {producto._stock}")
     
+    def buscar_producto(self, id_producto : str):
+        for producto in self._productos:
+            if producto.id_producto == id_producto:
+                return producto
+
 
 class Suscripcion:
 
@@ -58,6 +62,12 @@ class Suscripcion:
     @property
     def status(self):
         return self._status
+    
+    def cancelar(self):
+        self._status = "Cancelada"
+    
+    def reactivar(self):
+        self._status = "Activa"
 
 
 # Clase abstracta para inventarios - depende del sistema de inventario externo
@@ -68,13 +78,13 @@ class Inventario(ABC):
         pass
 
     @abstractmethod
-    def modificar_inventario_externo(self, producto : Producto, cantidad : int):
+    def modificar_inventario_externo(self, producto : Producto, 
+                                     cantidad : int):
         pass    
 
 
-
-# Implementamos de forma supuesta para el ejercicio  un sistema de inventario externo basado en excel
-
+# Implementamos de forma supuesta para el ejercicio  un 
+# sistema de inventario externo basado en excel
 class InventarioExcel(Inventario):
     def __init__(self, ruta_archivo : str):
         self._ruta_archivo = ruta_archivo
@@ -85,12 +95,14 @@ class InventarioExcel(Inventario):
         productos = []
         for row in ws.iter_rows(min_row=2, values_only=True): # type: ignore
             id_producto, nombre, descripcion, precio, stock = row
-            producto = Producto(id_producto, nombre, descripcion, precio, stock) # type: ignore
+            producto = Producto(id_producto, nombre, # type: ignore
+                                descripcion, precio, stock) # type: ignore
             productos.append(producto)
         wb.close()
         return productos
     
-    def modificar_inventario_externo(self, producto : Producto, cantidad : int) -> None:
+    def modificar_inventario_externo(self, producto : Producto, 
+                                     cantidad : int) -> None:
         wb = load_workbook(self._ruta_archivo)
         ws = wb.active
         for row in ws.iter_rows(min_row=2): # type: ignore

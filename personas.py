@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 
-
-
-
+from compras import OrdenCompra, Queja
+from logistica import EmpresaTransporte
 
 # Clase abstracta que sirve de base para todas los usuarios involucrados
 class Persona(ABC):
@@ -13,7 +12,10 @@ class Persona(ABC):
         self._nombre = nombre
         self._apellido = apellido
         self._correo = correo
-        
+    
+    @abstractmethod
+    def nombre_completo(self):
+        pass
         
 # Clase para clientes
 class Cliente(Persona):
@@ -59,7 +61,7 @@ class Cliente(Persona):
         return self._quejas
     
     # Metodo para crear orden de compra desde el cliente loggeado
-    def crear_orden_compra(self) -> OrdenCompra: # type: ignore
+    def crear_orden_compra(self) -> OrdenCompra: 
         from compras import OrdenCompra
         orden = OrdenCompra(self)
         self._ordenes_compra.append(orden)
@@ -82,7 +84,6 @@ class Cliente(Persona):
         else:
             print(f"\n" + f"No se encontró una orden con ID {id_orden}.")
         
-    
     def activar_suscripcion(self) -> None:
         from producto import Suscripcion
         if self._suscripcion is None:
@@ -94,7 +95,6 @@ class Cliente(Persona):
         else:
             print("\n" + "Ya tiene una suscripción activa.")
         
-    
     def cancelar_suscripcion(self) -> None:
         if self._suscripcion is not None:
             self._suscripcion.cancelar()
@@ -110,12 +110,12 @@ class Cliente(Persona):
             for queja in self._quejas:
                 print(f"- {queja}")
 
-    def crear_queja(self, descripcion : str, id_orden : str = None) -> Queja: # type: ignore
-        from compras import Queja
-        queja = Queja(self, descripcion, id_orden=id_orden) # type: ignore
+    def crear_queja(self, descripcion : str, 
+                    id_orden : str) -> Queja:
+        queja = Queja(self, descripcion, id_orden=id_orden) 
         self._quejas.append(queja)
         print("\n" + "Queja registrada con éxito.")
-        return queja # type: ignore
+        return queja 
 
 
 # Clase abstracta para empleados
@@ -128,6 +128,22 @@ class Empleado(Persona, ABC):
         self._contraseña = contraseña
         self._cargo = None
 
+    @property
+    def nombre_completo(self):
+        return f"{self._nombre} {self._apellido}"
+    
+    @property
+    def usuario(self):
+        return self._usuario
+    
+    @property
+    def cargo(self):
+        return self._cargo
+    
+    @property
+    def contraseña(self):
+        return self._contraseña
+    
 class AgenteDeposito(Empleado):
 
     def __init__(self, nombre : str, apellido : str, 
@@ -137,33 +153,25 @@ class AgenteDeposito(Empleado):
         self._cargo = "Agente"
 
     @property
-    def nombre_completo(self):
-        return f"{self._nombre} {self._apellido}"
-    
-    @property
-    def usuario(self):
-        return self._usuario
-    
-    @property
-    def cargo(self):
-        return self._cargo
-    
-    @property
     def contraseña(self): 
         return self._contraseña
     
-    def alistar_orden_para_envio(self, orden_compra : OrdenCompra, transportista : EmpresaTransporte) -> None: # type: ignore
+    def alistar_orden_para_envio(self, 
+                                 orden_compra : OrdenCompra, 
+                                 transportista : EmpresaTransporte) -> None:
         from logistica import OrdenEnvio
         
-        if orden_compra._estado == "Pagada":
-            envio = OrdenEnvio(orden_compra) # type: ignore
-            envio.transportista = transportista # type: ignore
-            orden_compra.estado = "Enviada" # type: ignore
-            orden_compra.orden_envio = envio # type: ignore
+        if orden_compra.estado == "Pagada":
+            envio = OrdenEnvio(orden_compra)
+            envio.transportista = transportista 
+            orden_compra.estado = "Enviada"
+            orden_compra.orden_envio = envio 
 
-            print(f"\n" + f"Orden {orden_compra.id_orden} alistada para envío.")
+            print(f"\n" + f"Orden {orden_compra.id_orden} "
+                  f"alistada para envío.")
         else:
-            print(f"\n" + f"Orden {orden_compra.id_orden} no se encuentra en estado pagada.")
+            print(f"\n" + f"Orden {orden_compra.id_orden} "
+                  f"no se encuentra en estado pagada.")
 
 class GerenteRP(Empleado):
 
@@ -173,17 +181,6 @@ class GerenteRP(Empleado):
                          contraseña)
         self._cargo = "Gerente"
     
-    @property
-    def nombre_completo(self):
-        return f"{self._nombre} {self._apellido}"
-    
-    @property
-    def usuario(self):
-        return self._usuario
-    
-    @property
-    def cargo(self):
-        return self._cargo
     
     # Metodo para mostrar quejas registradas en el sistema
     def mostrar_quejas(self, quejas : list) -> None:

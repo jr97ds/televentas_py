@@ -1,5 +1,14 @@
 from compras import OrdenCompra
-from personas import Cliente
+
+class EmpresaTransporte:
+
+    def __init__(self, nombre : str):
+        self._nombre = nombre
+
+    @property
+    def nombre(self):
+        return self._nombre
+
 
 class OrdenEnvio:
     def __init__(self,  orden_compra : OrdenCompra):
@@ -27,11 +36,3 @@ class OrdenEnvio:
     def transportista(self, empresa_transporte: EmpresaTransporte):
         self._transportista = empresa_transporte
 
-class EmpresaTransporte:
-
-    def __init__(self, nombre : str):
-        self._nombre = nombre
-
-    @property
-    def nombre(self):
-        return self._nombre
