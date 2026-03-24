@@ -3,15 +3,15 @@ from abc import ABC
 from producto import Inventario, Producto
 
 class MetodoPago(ABC):
-    pass
-    
+    def __init__(self, titular : str):
+        self._titular = titular
 
 class TarjetaCredito(MetodoPago):
 
-    def __init__(self, numero : str, titular : str, 
+    def __init__(self, numero : str, 
                  fecha_expiracion : str, cvv : str):
+        super().__init__(titular=numero)
         self._numero = numero
-        self._titular = titular
         self._fecha_expiracion = fecha_expiracion
         self._cvv = cvv
 

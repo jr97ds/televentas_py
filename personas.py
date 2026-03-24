@@ -20,10 +20,8 @@ class Persona(ABC):
 # Clase para clientes
 class Cliente(Persona):
 
-    def __init__(self, nombre : str, apellido : str, 
-                 direccion : str, correo : str):
+    def __init__(self, nombre : str, apellido : str, correo : str):
         super().__init__(nombre, apellido, correo)
-        self._direccion = direccion
         self._suscripcion = None
         self._quejas = []
         self._ordenes_compra = []
@@ -39,10 +37,6 @@ class Cliente(Persona):
     @property
     def apellido(self):
         return self._apellido
-    
-    @property
-    def direccion(self):
-        return self._direccion
     
     @property
     def nombre_completo(self):
