@@ -34,6 +34,10 @@ class Producto:
 class Catalogo:
     def __init__(self):
         self._productos = []
+
+    @property
+    def productos(self):
+        return self._productos
     
     # Cargar productos al catálogo 
     def agregar_producto(self, producto : Producto) -> None:
@@ -41,7 +45,9 @@ class Catalogo:
 
     def mostrar_catalogo(self) -> None:
         for producto in self._productos:
-            print(f"ID: {producto._id_producto} - {producto._nombre} - ${producto._precio} - Stock: {producto._stock}")
+            print(f"ID: {producto._id_producto} - "
+                  f"{producto._nombre} - ${producto._precio} - "
+                  f"Stock: {producto._stock}")
     
 
 class Suscripcion:
@@ -61,9 +67,9 @@ class Inventario(ABC):
     def cargar_inventario_externo(self):
         pass
 
-    #@abstractmethod
-    #def modificar_inventario_externo(self, producto : Producto, cantidad : int):
-        #pass    
+    @abstractmethod
+    def modificar_inventario_externo(self, producto : Producto, cantidad : int):
+        pass    
 
 
 
@@ -81,7 +87,7 @@ class InventarioExcel(Inventario):
             id_producto, nombre, descripcion, precio, stock = row
             producto = Producto(id_producto, nombre, descripcion, precio, stock) # type: ignore
             productos.append(producto)
-            wb.close()
+        wb.close()
         return productos
     
     def modificar_inventario_externo(self, producto : Producto, cantidad : int) -> None:

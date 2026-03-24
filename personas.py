@@ -88,8 +88,8 @@ class Cliente(Persona):
         if self._suscripcion is None:
             self._suscripcion = Suscripcion()
             print("\n" + "Suscripción activada con éxito.")
-        elif self._suscripcion.status == "Cancelada":
-            self._suscripcion._status = "Activa"
+        elif self._suscripcion._status == "Cancelada":
+            self._suscripcion.reactivar()
             print("\n" + "Suscripción reactivada con éxito.")
         else:
             print("\n" + "Ya tiene una suscripción activa.")
@@ -97,7 +97,7 @@ class Cliente(Persona):
     
     def cancelar_suscripcion(self) -> None:
         if self._suscripcion is not None:
-            self._suscripcion._status = "Cancelada"
+            self._suscripcion.cancelar()
             print("\n" + "Suscripción cancelada con éxito.")
         else:
             print("\n" + "No tiene una suscripción activa para cancelar.")

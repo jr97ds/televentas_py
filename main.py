@@ -142,7 +142,7 @@ while True:
                         
                             producto_a_añadir = None
 
-                            for producto in catalogo._productos:
+                            for producto in catalogo.productos: 
                                 if producto.id_producto == id_producto_a_añadir:
                                     producto_a_añadir = producto
                                     break
@@ -170,7 +170,7 @@ while True:
 
                                 # Terminar proceso de compra y pasar a pago
                                 elif status_orden == "0":
-                                    orden_compra_actual._estado = "Pendiente Pago" 
+                                    orden_compra_actual.estado = "Pendiente Pago" 
                                     print("\n" + "Orden lista para pago, por favor agregue su metodo de pago")
                                     break
                             
@@ -398,7 +398,7 @@ while True:
                     contraseña = input("Ingrese su contraseña: ")
                     encontrado = False
                     for e in empleados:
-                        if e.usuario == usuario and e._contraseña == contraseña:
+                        if e.usuario == usuario and e.contraseña == contraseña:
                             empleado_actual = e
                             login = True
                             encontrado = True
@@ -474,11 +474,13 @@ while True:
                             
                             opcion_transportista = input("\n" + "Seleccione una opción: ")
 
-                            transportista_seleccionado = transportistas[int(opcion_transportista) - 1]
-                            
                             if opcion_transportista not in [str(i) for i in range(1, len(transportistas) + 1)]:
                                 opcion_invalida()
                                 continue
+
+                            transportista_seleccionado = transportistas[int(opcion_transportista) - 1]
+                            
+                            
 
                             empleado_actual.alistar_orden_para_envio(orden_a_alistar, transportista_seleccionado) # type: ignore
                         
@@ -496,7 +498,3 @@ while True:
     else:
         opcion_invalida()
         
-
-
-
-menu_usuario()

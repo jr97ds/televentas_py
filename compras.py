@@ -3,6 +3,18 @@ from personas import Cliente
 from abc import ABC
 from producto import Inventario, Producto
 
+class MetodoPago(ABC):
+    pass
+    
+class TarjetaCredito(MetodoPago):
+
+    def __init__(self, numero : str, titular : str, 
+                 fecha_expiracion : str, cvv : str):
+        self._numero = numero
+        self._titular = titular
+        self._fecha_expiracion = fecha_expiracion
+        self._cvv = cvv
+
 class OrdenCompra:
 
     _contador = 0
@@ -92,6 +104,10 @@ class DetalleOrden:
         self._producto = producto
         self._cantidad = cantidad
         self._subtotal = producto.precio * cantidad
+    
+    @property
+    def producto(self):
+        return self._producto
 
     @property
     def subtotal(self):
@@ -118,14 +134,3 @@ class Queja:
     def __str__(self) -> str:
         return f"ID: {self._id_queja} -id_orden: {self._id_orden} - Cliente: {self._cliente.nombre_completo} -Descripción: {self._descripcion} - Estado: {self._estado}"
 
-class MetodoPago(ABC):
-    pass
-    
-class TarjetaCredito(MetodoPago):
-
-    def __init__(self, numero : str, titular : str, 
-                 fecha_expiracion : str, cvv : str):
-        self._numero = numero
-        self._titular = titular
-        self._fecha_expiracion = fecha_expiracion
-        self._cvv = cvv
