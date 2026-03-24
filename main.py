@@ -1,9 +1,10 @@
-from compras import OrdenCompra, TarjetaCredito
+from compras import OrdenCompra, Queja, TarjetaCredito
 from personas import Cliente, GerenteRP , AgenteDeposito
-from producto import Producto , InventarioExcel , Catalogo , Suscripcion
+from producto import Inventario, Producto , InventarioExcel , Catalogo , Suscripcion
 from logistica import OrdenEnvio , EmpresaTransporte
 
 
+# ----- CARGA DE DATOS PARA PRUEBAS ----- #
 jose = Cliente("Jose", "Rojas", "Calle 123", "jose")
 clientes = [jose] # Lista para almacenar todos los clientes registrados en el sistema
 
@@ -49,66 +50,24 @@ def crear_cliente() -> Cliente:
     print("\n" + f"{nombre} , has sido registrado exitosamente")
     return Cliente(nombre, apellido, direccion, correo)
 
+# Funcion para mostrar la orden de compra actual del cliente loggeado
 def mostrar_orden_actual(orden_compra_actual : OrdenCompra) -> None:
     print("\n" + "Orden Actual:")
     for item in orden_compra_actual.detalles: 
         print(item)
 
+# Funcion para mostrar mensaje de opcion invalida
 def opcion_invalida() -> None:
     print("\n" + "Opción inválida, por favor seleccione una opción válida")
 
-# --------------------Inicialización del programa-------------------- #
-
-catalogo = inicializar_catalogo(inventario)
-
-while True:
-    menu_usuario()
-    opcion_portal = input("\n" + "Seleccione una opción: ")
-
-    # Portal Clientes
-    if opcion_portal == "1":
-        print("\n" + "Bienvenido al Portal de Clientes")
-
-        print("\n" + "Seleccione una de las siguientes opciones")
-        print("1. Soy cliente nuevo")
-        print("2. Soy cliente registrado")
-        print("3. Volver al menú principal")
-
-        opcion_cliente = input("\n" + "Seleccione una opción: ")
-
-        # Registro Usuario Nuevo
-        if opcion_cliente == "1":
-            print("\n" + "Por favor regístrese para continuar")
-            cliente_actual = crear_cliente()
-            # añadir cliente a la lista de clientes registrados
-            clientes.append(cliente_actual)
-            login = True
-
-        # Login Usuario Registrado
-        elif opcion_cliente == "2":
-            print("\n" + "Por favor inicie sesión para continuar")
-            while not login: 
-                correo = input("Ingrese su correo electrónico: ")
-                encontrado = False
-                for c in clientes:
-                    if c.correo == correo:
-                        cliente_actual = c
-                        login = True
-                        encontrado = True
-                        break
-                if not encontrado:
-                        print("\n" + "Correo no encontrado, por favor intente de nuevo")
-
-        # Volver al menú principal
-        elif opcion_cliente == "3":
-            continue
-
-
-        # Desde aqui sigue la logica de un cliente loggeado
-        print("\n" + f"Bienvenido, {cliente_actual.nombre} {cliente_actual.apellido}!")     # type: ignore
-
-        #menu para cliente loggeado
-        while login:    
+def menu_cliente_loggeado(cliente_actual : Cliente,
+                          catalogo : Catalogo,
+                          inventario : InventarioExcel,
+                          ordenes_compra : list[OrdenCompra],
+                          quejas : list[Queja],
+                          transportistas : list[EmpresaTransporte],
+                          ) -> None:
+     while True:    
             print("\n" + "----- MENU CLIENTE -----") 
             print("Seleccione una de las siguientes opciones")   
             print("1. Ver catálogo de productos")
@@ -141,12 +100,8 @@ while True:
                             cantidad_a_añadir = int(input("Ingrese la cantidad que desea agregar: "))
                         
                             producto_a_añadir = None
-
-                            for producto in catalogo.productos: 
-                                if producto.id_producto == id_producto_a_añadir:
-                                    producto_a_añadir = producto
-                                    break
-                        
+                            producto_a_añadir = catalogo.buscar_producto(id_producto_a_añadir)
+                            
                             if producto_a_añadir is None:
                                 print("\n" + "Producto no encontrado, por favor intente de nuevo")
                                 continue
@@ -179,7 +134,7 @@ while True:
                                     id_producto_a_eliminar = input("\n" + "Ingrese el ID del producto que desea eliminar de su orden: ").upper()
                                     
                                     for detalle in orden_compra_actual.detalles: 
-                                        if detalle._producto.id_producto == id_producto_a_eliminar:
+                                        if detalle.producto.id_producto == id_producto_a_eliminar:
                                             orden_compra_actual.eliminar_producto(id_producto_a_eliminar) 
                                             print("\n" + f"Producto  eliminado de su orden")
                                             mostrar_orden_actual(orden_compra_actual)
@@ -380,10 +335,144 @@ while True:
             # Cierre Sesion Cliente
             elif opcion_cliente_loggeado == "0":
                 print("\n" + "Cerrando sesión...")
-                login = False
-                cliente_actual = None
+                return
+
+def menu_gerente(empleado_actual : GerenteRP, quejas : list) -> None:
+    while True:
+        print("\n" + f"Bienvenido, {empleado_actual.cargo}  {empleado_actual.nombre_completo}!") # type: ignore
+        print("\n" + "Estas son las quejas registradas en el sistema:")
+        if quejas:
+            empleado_actual.mostrar_quejas(quejas) # type: ignore
+        else:
+            print("\n" + "No hay quejas registradas en el sistema")
+
+        print("\n" + "Presione '0' para cerrar sesión")
+        opcion_cerrar_sesion = input("\n" + "Seleccione una opción: ")
+        
+        if opcion_cerrar_sesion == "0":
+                    print("\n" + "Sesion cerrada")
+                    return
+        else:
+                    opcion_invalida()
+                    continue
+
+def menu_agente(empleado_actual : AgenteDeposito,
+                ordenes_compra : list[OrdenCompra],
+                transportistas : list[EmpresaTransporte],
+                inventario : Inventario) -> None:
+    while True:
+    # Menu Agente de Deposito
+        print("\n" + "----- MENU AGENTE -----")
+        print("Seleccione una de las siguientes opciones")   
+        print("1. Ver órdenes de compra")
+        print("2. Alistar pedidos para envío")
+        print("0. Cerrar sesión")
+
+        opcion_agente = input("\n" + "¿Que desea hacer?: ")
+
+        # Ver ordenes de compra
+        if opcion_agente == "1":
+            if ordenes_compra:
+                for orden in ordenes_compra:
+                    print(orden)
+            else:
+                print("\n" + "No hay órdenes de compra registradas en el sistema")
+    
+        # Alistar pedidos para envío
+        elif opcion_agente == "2":
+
+            while True:
+                id_orden_a_alistar = input("\n" + "Ingrese el ID de la orden que desea alistar para envío o presione '0' para regresar al menú anterior: ").upper()
+
+                if id_orden_a_alistar == "0":
+                    break
                 
-            
+                orden_a_alistar = None
+                for orden in ordenes_compra:
+                    if orden.id_orden == id_orden_a_alistar:
+                        orden_a_alistar = orden
+                        break
+                
+                if orden_a_alistar is None:
+                    print("\n" + "No se encontró una orden con ese ID, por favor intente de nuevo")
+                    continue
+
+                print("\n" + "Seleccione la empresa de transporte para el envío:")
+                for idx, transportista in enumerate(transportistas):
+                    print(f"{idx + 1}. {transportista.nombre}")
+                
+                opcion_transportista = input("\n" + "Seleccione una opción: ")
+
+                if opcion_transportista not in [str(i) for i in range(1, len(transportistas) + 1)]:
+                    opcion_invalida()
+                    continue
+
+                transportista_seleccionado = transportistas[int(opcion_transportista) - 1]
+                empleado_actual.alistar_orden_para_envio(orden_a_alistar, transportista_seleccionado) # type: ignore
+        
+        elif opcion_agente == "0":
+            print("\n" + "Sesion cerrada")
+            return
+        else:
+            opcion_invalida()
+            continue
+                
+# --------------------Inicialización del programa-------------------- #
+
+catalogo = inicializar_catalogo(inventario)
+
+while True:
+    menu_usuario()
+    opcion_portal = input("\n" + "Seleccione una opción: ")
+
+    # Portal Clientes
+    if opcion_portal == "1":
+        print("\n" + "Bienvenido al Portal de Clientes")
+
+        print("\n" + "Seleccione una de las siguientes opciones")
+        print("1. Soy cliente nuevo")
+        print("2. Soy cliente registrado")
+        print("3. Volver al menú principal")
+
+        opcion_cliente = input("\n" + "Seleccione una opción: ")
+
+        # Registro Usuario Nuevo
+        if opcion_cliente == "1":
+            print("\n" + "Por favor regístrese para continuar")
+            cliente_actual = crear_cliente()
+            # añadir cliente a la lista de clientes registrados
+            clientes.append(cliente_actual)
+            login = True
+
+        # Login Usuario Registrado
+        elif opcion_cliente == "2":
+            print("\n" + "Por favor inicie sesión para continuar")
+            while not login: 
+                correo = input("Ingrese su correo electrónico: ")
+                encontrado = False
+                for c in clientes:
+                    if c.correo == correo:
+                        cliente_actual = c
+                        login = True
+                        encontrado = True
+                        break
+                if not encontrado:
+                        print("\n" + "Correo no encontrado, por favor intente de nuevo")
+
+        # Volver al menú principal
+        elif opcion_cliente == "3":
+            continue
+        else:
+            opcion_invalida()
+            continue
+        
+        # Desde aqui sigue la logica de un cliente loggeado
+        print("\n" + f"Bienvenido, {cliente_actual.nombre} {cliente_actual.apellido}!")     # type: ignore
+
+        #menu para cliente loggeado
+        menu_cliente_loggeado(cliente_actual, catalogo, inventario, ordenes_compra, quejas, transportistas) # type: ignore
+        login = False
+        cliente_actual = None
 
         
 
@@ -408,92 +497,19 @@ while True:
 
         # Ruta para gerente 
         if empleado_actual.cargo == "Gerente": # type: ignore
-            while login:
-                print("\n" + f"Bienvenido, {empleado_actual.cargo}  {empleado_actual.nombre_completo}!") # type: ignore
-                print("\n" + "Estas son las quejas registradas en el sistema:")
-                if quejas:
-                    empleado_actual.mostrar_quejas(quejas) # type: ignore
-                else:
-                    print("\n" + "No hay quejas registradas en el sistema")
-
-                print("\n" + "Presione '0' para cerrar sesión")
-                opcion_cerrar_sesion = input("\n" + "Seleccione una opción: ")
-                
-                if opcion_cerrar_sesion == "0":
-                            print("\n" + "Sesion cerrada")
-                            login = False
-                            empleado_actual = None
-                else:
-                            opcion_invalida()
-                            continue
+            print("\n" + f"Bienvenido {empleado_actual.cargo} {empleado_actual.nombre_completo}!") # type: ignore
+            menu_gerente(empleado_actual, quejas) # type: ignore
+            login = False
+            empleado_actual = None
+            
                 
         # Ruta para agente de deposito
         elif empleado_actual.cargo == "Agente": # type: ignore
             print("\n" + f"Bienvenido {empleado_actual.cargo} {empleado_actual.nombre_completo}!") # type: ignore
-        
-            while login:
-                # Menu Agente de Deposito
-                    print("\n" + "----- MENU AGENTE -----")
-                    print("Seleccione una de las siguientes opciones")   
-                    print("1. Ver órdenes de compra")
-                    print("2. Alistar pedidos para envío")
-                    print("0. Cerrar sesión")
-
-                    opcion_agente = input("\n" + "¿Que desea hacer?: ")
-
-                    # Ver ordenes de compra
-                    if opcion_agente == "1":
-                        if ordenes_compra:
-                            for orden in ordenes_compra:
-                                print(orden)
-                        else:
-                            print("\n" + "No hay órdenes de compra registradas en el sistema")
-                
-                    # Alistar pedidos para envío
-                    elif opcion_agente == "2":
-
-                        while True:
-                            id_orden_a_alistar = input("\n" + "Ingrese el ID de la orden que desea alistar para envío o presione '0' para regresar al menú anterior: ").upper()
-
-                            if id_orden_a_alistar == "0":
-                                break
-                            
-                            orden_a_alistar = None
-                            for orden in ordenes_compra:
-                                if orden.id_orden == id_orden_a_alistar:
-                                    orden_a_alistar = orden
-                                    break
-                            
-                            if orden_a_alistar is None:
-                                print("\n" + "No se encontró una orden con ese ID, por favor intente de nuevo")
-                                continue
-
-                            print("\n" + "Seleccione la empresa de transporte para el envío:")
-                            for idx, transportista in enumerate(transportistas):
-                                print(f"{idx + 1}. {transportista.nombre}")
-                            
-                            opcion_transportista = input("\n" + "Seleccione una opción: ")
-
-                            if opcion_transportista not in [str(i) for i in range(1, len(transportistas) + 1)]:
-                                opcion_invalida()
-                                continue
-
-                            transportista_seleccionado = transportistas[int(opcion_transportista) - 1]
-                            
-                            
-
-                            empleado_actual.alistar_orden_para_envio(orden_a_alistar, transportista_seleccionado) # type: ignore
-                        
-
-                    elif opcion_agente == "0":
-                        print("\n" + "Sesion cerrada")
-                        login = False
-                        empleado_actual = None
-                    
-                    else:
-                        opcion_invalida()
-                        continue
-
+            menu_agente(empleado_actual, ordenes_compra, transportistas, inventario) # type: ignore
+            login = False
+            empleado_actual = None
+            
 
     else:
         opcion_invalida()
