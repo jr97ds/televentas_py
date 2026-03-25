@@ -29,6 +29,10 @@ class Producto:
     def stock(self):
         return self._stock
 
+    @stock.setter
+    def stock(self, nuevo_stock: int):
+        self._stock = nuevo_stock
+
 
 class Catalogo:
     def __init__(self):
@@ -46,7 +50,7 @@ class Catalogo:
         for producto in self.productos:
             print(f"ID: {producto.id_producto} - "
                   f"{producto.nombre} - ${producto.precio} - "
-                  f"Stock: {producto._stock}")
+                  f"Stock: {producto.stock}")
     
     def buscar_producto(self, id_producto : str):
         for producto in self._productos:
@@ -111,3 +115,4 @@ class InventarioExcel(Inventario):
                 break
         wb.save(self._ruta_archivo)
         wb.close()
+        producto.stock = cantidad

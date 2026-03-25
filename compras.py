@@ -67,9 +67,20 @@ class OrdenCompra:
 
     # Metodo para agregar productos a la orden de compra
     def agregar_producto(self, producto : Producto, cantidad : int) -> bool:
-        if cantidad > producto.stock:
+        if cantidad <= 0:
+            print("\n" + "La cantidad debe ser mayor a 0")
+            return False
+
+        cantidad_ya_agregada = sum(
+            detalle.cantidad
+            for detalle in self._detalles
+            if detalle.producto.id_producto == producto.id_producto
+        )
+        stock_disponible = producto.stock - cantidad_ya_agregada
+
+        if cantidad > stock_disponible:
             print(f"\n" + f"No hay suficiente stock para el producto "
-                  f"{producto.nombre}. Stock disponible: {producto.stock}")
+                  f"{producto.nombre}. Stock disponible: {stock_disponible}")
             return False 
         else:
             detalle = DetalleOrden(producto, cantidad)

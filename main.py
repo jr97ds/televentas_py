@@ -95,6 +95,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
 
         # Mostrar Catalogo de Productos
         if opcion_cliente_loggeado == "1":
+            catalogo = inicializar_catalogo(inventario)
             print("\n" + "----- CATALOGO -----")
             catalogo.mostrar_catalogo()
 
@@ -132,12 +133,13 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                             f"por favor ingrese una cantidad mayor a 0")
                             continue
 
-                        orden_compra_actual.agregar_producto(
+                        status= orden_compra_actual.agregar_producto(
                             producto_a_añadir, cantidad_a_añadir) # type: ignore
 
-                        print("\n" + 
-                              f"{cantidad_a_añadir} unidades de "
-                              f"{producto_a_añadir.nombre} agregadas")
+                        if status:
+                            print("\n" + 
+                                f"{cantidad_a_añadir} unidades de "
+                                f"{producto_a_añadir.nombre} agregadas")
 
                         mostrar_orden_actual(orden_compra_actual)
 
