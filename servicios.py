@@ -1,6 +1,6 @@
 from compras import OrdenCompra
 from personas import Cliente
-from producto import Suscripcion
+from producto import Suscripcion, Inventario
 from compras import Queja
 
 class ServicioCliente: 
@@ -62,3 +62,17 @@ class ServicioCliente:
         cliente.quejas.append(queja)
         print("\n" + "Queja registrada con éxito.")
         return queja 
+    
+class InventarioService:
+
+    def actualizar_inventario(self, orden_compra: OrdenCompra, inventario : Inventario) -> None:
+        for detalle in orden_compra.detalles:
+            nuevo_stock = detalle.producto.stock - detalle.cantidad
+            inventario.modificar_inventario_externo(detalle.producto, 
+                                                    nuevo_stock) 
+    
+    def devolver_a_inventario(self, orden_compra: OrdenCompra, inventario : Inventario) -> None:
+        for detalle in orden_compra.detalles:
+            nuevo_stock = detalle.producto.stock + detalle.cantidad
+            inventario.modificar_inventario_externo(detalle.producto, 
+                                                    nuevo_stock) 
