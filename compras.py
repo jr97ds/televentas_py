@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from personas import Cliente
 from abc import ABC
-from producto import Inventario, Producto
+from producto import Producto
 
 class MetodoPago(ABC):
     def __init__(self, titular : str):
@@ -101,18 +101,6 @@ class OrdenCompra:
         self._metodo_pago = metodo_pago
         self._estado = "Pagada"
     
-    def actualizar_inventario(self,inventario : Inventario) -> None:
-        for detalle in self._detalles:
-            nuevo_stock = detalle.producto.stock - detalle.cantidad
-            inventario.modificar_inventario_externo(detalle.producto, 
-                                                    nuevo_stock) 
-    
-    def devolver_a_inventario(self, inventario : Inventario) -> None:
-        for detalle in self._detalles:
-            nuevo_stock = detalle.producto.stock + detalle.cantidad
-            inventario.modificar_inventario_externo(detalle.producto, 
-                                                    nuevo_stock) 
-
     def __str__(self) -> str:
         return (
             f"ID: {self._id_orden} - "

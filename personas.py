@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from compras import OrdenCompra, Queja
+from compras import OrdenCompra
 from logistica import EmpresaTransporte
 
 # Clase abstracta que sirve de base para todas los usuarios involucrados
@@ -54,63 +54,10 @@ class Cliente(Persona):
     def quejas(self):
         return self._quejas
     
-    # Metodo para crear orden de compra desde el cliente loggeado
-    def crear_orden_compra(self) -> OrdenCompra: 
-        from compras import OrdenCompra
-        orden = OrdenCompra(self)
-        self._ordenes_compra.append(orden)
-        return orden
+    @suscripcion.setter
+    def suscripcion(self, tipo_suscripcion : str):
+        self._suscripcion = tipo_suscripcion
     
-    def mostrar_ordenes_compra(self) -> None:
-        if not self._ordenes_compra:
-            print("\n" + "No tiene órdenes de compra registradas.")
-        else:
-            print("\n" + "Órdenes de Compra:")
-            for orden in self._ordenes_compra:
-                print(orden)
-
-    def borrar_orden_compra(self, id_orden : str) -> None:
-        for orden in self._ordenes_compra:
-                if orden.id_orden == id_orden:
-                    self._ordenes_compra.remove(orden)
-                    print(f"\n" + f"Orden {id_orden} eliminada con éxito.")
-                    break
-        else:
-            print(f"\n" + f"No se encontró una orden con ID {id_orden}.")
-        
-    def activar_suscripcion(self) -> None:
-        from producto import Suscripcion
-        if self._suscripcion is None:
-            self._suscripcion = Suscripcion()
-            print("\n" + "Suscripción activada con éxito.")
-        elif self._suscripcion._status == "Cancelada":
-            self._suscripcion.reactivar()
-            print("\n" + "Suscripción reactivada con éxito.")
-        else:
-            print("\n" + "Ya tiene una suscripción activa.")
-        
-    def cancelar_suscripcion(self) -> None:
-        if self._suscripcion is not None:
-            self._suscripcion.cancelar()
-            print("\n" + "Suscripción cancelada con éxito.")
-        else:
-            print("\n" + "No tiene una suscripción activa para cancelar.")
-
-    def mostrar_quejas(self) -> None:
-        if not self._quejas:
-            print("\n" + "No tiene quejas registradas.")
-        else:
-            print("\n" + "Quejas Registradas:")
-            for queja in self._quejas:
-                print(f"- {queja}")
-
-    def crear_queja(self, descripcion : str, 
-                    id_orden : str) -> Queja:
-        queja = Queja(self, descripcion, id_orden=id_orden) 
-        self._quejas.append(queja)
-        print("\n" + "Queja registrada con éxito.")
-        return queja 
-
 
 # Clase abstracta para empleados
 class Empleado(Persona, ABC):

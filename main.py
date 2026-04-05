@@ -99,6 +99,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
 
         # Mostrar Catalogo de Productos
         if opcion_cliente_loggeado == "1":
+            orden_compra_actual = None
             catalogo = inicializar_catalogo(inventario)
             print("\n" + "----- CATALOGO -----")
             catalogo.mostrar_catalogo()
@@ -188,7 +189,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                     break
 
         # Asignar metodo de pago a la orden de compra y finalizar la orden
-            while orden_compra_actual.estado == "Pendiente Pago":
+            while orden_compra_actual and orden_compra_actual.estado == "Pendiente Pago":
 
                 print("\n" + "Eliga su método de pago")
                 print("1. Tarjeta de crédito")
@@ -411,8 +412,6 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
 
 def menu_gerente(empleado_actual : GerenteRP, quejas : list) -> None:
     while True:
-        print("\n" + f"Bienvenido, {empleado_actual.cargo} "
-              f"{empleado_actual.nombre_completo}!") 
         print("\n" + "Estas son las quejas registradas en el sistema:")
         if quejas:
             empleado_actual.mostrar_quejas(quejas) # type: ignore
