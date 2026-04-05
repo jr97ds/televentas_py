@@ -2,6 +2,7 @@ from compras import OrdenCompra, Queja, TarjetaCredito
 from personas import Cliente, GerenteRP , AgenteDeposito
 from producto import Inventario, InventarioExcel , Catalogo 
 from logistica import EmpresaTransporte
+from servicios import ServicioCliente, ServicioInventario
 
 
 # ----- CARGA DE DATOS PARA PRUEBAS ----- #
@@ -22,6 +23,10 @@ quejas = [] # Lista para almacenar todas las quejas registradas
 # Variables de login
 cliente_actual = None 
 login = False
+
+# Inicializacion de Servicios
+servicio_cliente = ServicioCliente()
+servicio_inventario = ServicioInventario()
 
 #Creación de Productos a partir del inventario externo
 inventario = InventarioExcel("inventario_televentas.xlsx")
@@ -67,12 +72,11 @@ def proceso_orden(orden_compra_actual : OrdenCompra,
             orden_compra_actual.eliminar_producto(id_producto_a_eliminar) 
             print("\n" + f"Producto  eliminado de su orden")
             mostrar_orden_actual(orden_compra_actual)
-            break
-        else:
-            print("\n" + "Producto no encontrado "
-                f"en su orden, por favor intente "
-                f"de nuevo")
-            break
+            return
+        
+        print("\n" + "Producto no encontrado "
+            f"en su orden, por favor intente "
+            f"de nuevo")
 
 # Funcion para mostrar el menu del cliente loggeado y gestionar sus opciones
 def menu_cliente_loggeado(cliente_actual : Cliente,
@@ -108,7 +112,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
 
                 # Crear Orden de Compra desde el cliente loggeado
                 if opcion_orden == "1":
-                    orden_compra_actual = cliente_actual.crear_orden_compra() 
+                    orden_compra_actual = servicio_cliente.crear_orden_compra(cliente_actual)
 
                     while orden_compra_actual.estado == "Abierta":
                         id_producto_a_añadir = input(
@@ -210,7 +214,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                           f"ha sido finalizada")
                     ordenes_compra.append(orden_compra_actual)
 
-                    orden_compra_actual.actualizar_inventario(inventario) 
+                    servicio_inventario.actualizar_inventario(orden_compra_actual, inventario)
 
                     break
                 else:
@@ -220,7 +224,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
 
         # Ver ordenes de compra del cliente loggeado
         elif opcion_cliente_loggeado == "2":
-            cliente_actual.mostrar_ordenes_compra() 
+            servicio_cliente.mostrar_ordenes_compra(cliente_actual) 
             
             if cliente_actual.ordenes_compra: 
 
@@ -256,8 +260,8 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                             f"intente de nuevo")
                             continue
                         else:
-                            orden_a_eliminar.devolver_a_inventario(inventario) 
-                            cliente_actual.borrar_orden_compra(id_orden_a_eliminar) 
+                            servicio_inventario.devolver_a_inventario(orden_a_eliminar, inventario)
+                            servicio_cliente.borrar_orden_compra(id_orden_a_eliminar, cliente_actual) 
 
                             if orden_a_eliminar in ordenes_compra:
                                 ordenes_compra.remove(orden_a_eliminar)
@@ -281,7 +285,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                 print("\n" + "No tiene quejas registradas")
             # Si tiene quejas registradas
             else:
-                cliente_actual.mostrar_quejas() # type: ignore
+                servicio_cliente.mostrar_quejas(cliente_actual) # type: ignore
 
             while True:
                 print("\n" + "Presione '1' para registrar una nueva queja, "
@@ -322,7 +326,8 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                                 id_orden_queja = None
                                 continue
                         #Registro de queja
-                        ultima_q = cliente_actual.crear_queja(
+                        ultima_q = servicio_cliente.crear_queja(
+                            cliente_actual,
                             descripcion_queja, 
                             id_orden_queja  # type: ignore
                             ) 
@@ -347,7 +352,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                     opcion_suscripcion = input("\n" + "Seleccione una opción: ")
 
                     if opcion_suscripcion == "1":
-                        cliente_actual.activar_suscripcion()
+                        servicio_cliente.activar_suscripcion(cliente_actual)
                         break
                     
                     elif opcion_suscripcion == "0":
@@ -368,7 +373,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                         )
                     # Cancelacion Suscripcion
                     if opcion_suscripcion_activa == "1":
-                        cliente_actual.cancelar_suscripcion() 
+                        servicio_cliente.cancelar_suscripcion(cliente_actual)
                         break
                     # Regresar menu anterior
                     elif opcion_suscripcion_activa == "0":
@@ -389,7 +394,7 @@ def menu_cliente_loggeado(cliente_actual : Cliente,
                         )
                     # Reactivar Suscripcion
                     if opcion_suscripcion_cancelada == "1":
-                        cliente_actual.activar_suscripcion() 
+                        servicio_cliente.activar_suscripcion(cliente_actual)
                         break
                     # Regresar menu anterior
                     elif opcion_suscripcion_cancelada == "0":

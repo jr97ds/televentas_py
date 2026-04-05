@@ -63,7 +63,7 @@ class ServicioCliente:
         print("\n" + "Queja registrada con éxito.")
         return queja 
     
-class InventarioService:
+class ServicioInventario:
 
     def actualizar_inventario(self, orden_compra: OrdenCompra, inventario : Inventario) -> None:
         for detalle in orden_compra.detalles:
